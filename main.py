@@ -14,6 +14,7 @@ from src.repositories.order_repository import OrderRepository
 from src.repositories.payment_repository import PaymentRepository
 from src.agents.order_seller_agent import OrderSellerAgent
 from src.agents.payment_agent import PaymentAgent
+from src.agents.delivery_agent import DeliveryAgent
 from src.agents.policy_agent import PolicyAgent
 from src.agents.verifier_agent import VerifierAgent
 from src.agents.coordinator_agent import CoordinatorAgent
@@ -34,12 +35,14 @@ def main():
     print("Initializing Multi-Agent System...")
     order_seller_agent = OrderSellerAgent(repository=order_repo)
     payment_agent = PaymentAgent(repository=payment_repo)
+    delivery_agent = DeliveryAgent()
     policy_agent = PolicyAgent()
     verifier_agent = VerifierAgent()
 
     coordinator = CoordinatorAgent(
         order_seller_agent=order_seller_agent,
         payment_agent=payment_agent,
+        delivery_agent=delivery_agent,
         policy_agent=policy_agent,
         verifier_agent=verifier_agent
     )

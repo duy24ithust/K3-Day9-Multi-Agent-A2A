@@ -29,11 +29,13 @@ class CoordinatorAgent:
         self,
         order_seller_agent=None,
         payment_agent=None,
+        delivery_agent=None,
         policy_agent=None,
         verifier_agent=None
     ):
         self.order_seller_agent = order_seller_agent
         self.payment_agent = payment_agent
+        self.delivery_agent = delivery_agent
         self.policy_agent = policy_agent
         self.verifier_agent = verifier_agent
 
@@ -90,9 +92,26 @@ class CoordinatorAgent:
             "is_split_payment": payment_res.is_split_payment
         })
 
-        # 4. Handoff to Delivery & Policy Agent
+        # 4. Handoff to Delivery Agent
+        if self.delivery_agent:
+            delivery_res = self.delivery_agent.analyze(order_seller_res)
+        else:
+            from src.agents.delivery_agent import DeliveryAgent
+            delivery_res = DeliveryAgent().analyze(order_seller_res)
+
+        trace_logs.append({
+            "case_id": case_id,
+            "agent": "DeliveryAgent",
+            "action": "analyze_delivery",
+            "is_late_delivery": delivery_res.is_late_delivery,
+            "is_seller_late": delivery_res.is_seller_late,
+            "late_seller_ids": delivery_res.late_seller_ids
+        })
+
+        # 5. Handoff to Policy Agent
         if self.policy_agent:
             policy_res: PolicyResult = self.policy_agent.evaluate(order_seller_res, payment_res)
+
         else:
             # Fallback/stub if agent not yet injected
             policy_res = PolicyResult(

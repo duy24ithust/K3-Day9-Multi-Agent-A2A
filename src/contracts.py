@@ -44,6 +44,15 @@ class OrderSellerResult(BaseModel):
     evidence_ids: List[str] = Field(default_factory=list, description="Evidence strings: order:..., item:..., seller:...")
 
 
+class DeliveryResult(BaseModel):
+    """Contract delivered by Delivery Agent."""
+    order_id: str = Field(..., description="Olist order ID")
+    is_late_delivery: bool = Field(False, description="True if customer delivery date > estimated delivery date")
+    is_seller_late: bool = Field(False, description="True if carrier delivery date > shipping_limit_date")
+    late_seller_ids: List[str] = Field(default_factory=list, description="List of offending seller IDs")
+
+
+
 class PaymentResult(BaseModel):
     """Contract delivered by Member 3 (Payment Agent)."""
     order_id: str = Field(..., description="Olist order ID")
