@@ -6,7 +6,7 @@
 | --------------- | ------------------------- |
 | Họ và tên       | Nguyễn Hữu Tuyền          |
 | MSSV            | 01605                     |
-| Khóa/Lớp        | K3 / D303 / E403          |
+| Khóa/Lớp        | K3 / D303         |
 | Vai trò chính   | Người 3 — Payment Agent   |
 | Ngày hoàn thành | 2026-08-05                |
 
