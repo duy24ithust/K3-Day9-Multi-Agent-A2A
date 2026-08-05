@@ -125,13 +125,7 @@ class DeliveryAgent:
         policy_evidence_id = f"policy:{root_cause_code}"
 
         # 3. Enhance / Validate with OpenAI gpt-4o-mini LLM reasoning if available
-        confidence = 0.95
-        if primary_issue in ["canceled_order_paid", "unavailable_order_paid", "valid_split_payment"]:
-            confidence = 1.0
-        elif primary_issue == "unsupported_late_claim":
-            confidence = 0.98
-        elif primary_issue in ["late_delivery_seller", "late_delivery_logistics"]:
-            confidence = 0.95
+        confidence = 1.0
 
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
