@@ -17,12 +17,22 @@ class PaymentAgent:
             repository = PaymentRepository()
         self.repository = repository
 
+    def analyze(
+        self,
+        order_id: str,
+        item_total_brl: float = 0.0,
+        freight_total_brl: float = 0.0
+    ) -> PaymentResult:
+        """Alias for process_payment to ensure compatibility with CoordinatorAgent."""
+        return self.process_payment(order_id, item_total_brl, freight_total_brl)
+
     def process_payment(
         self,
         order_id: str,
         item_total_brl: float = 0.0,
         freight_total_brl: float = 0.0
     ) -> PaymentResult:
+
         """
         Processes payment rows for an order, reconciles against order total, and builds PaymentResult.
 
