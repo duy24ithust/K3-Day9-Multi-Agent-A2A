@@ -1,7 +1,7 @@
 # BÁO CÁO CÁ NHÂN - MULTI-AGENT E-COMMERCE DISPUTE RESOLUTION
 
-**Họ và tên**: Nguyễn Đăng Nam  
-**Mã học viên**: 2A202601307 (5 số cuối: 01605)  
+**Họ và tên**: Nguyễn Hữu Tuyền  
+**Mã học viên / ID**: 01605  
 **Lớp**: D303 / E403  
 **Vai trò được phân công**: **Người 3 — Payment Agent** (Tính toán và đối soát thanh toán)
 
