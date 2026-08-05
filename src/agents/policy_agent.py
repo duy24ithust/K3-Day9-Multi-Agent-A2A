@@ -86,7 +86,7 @@ class PolicyAgent:
             return PolicyResult(
                 primary_issue="canceled_order_paid",
                 case_status="action_required",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="ORDER_CANCELED_AFTER_PAYMENT",
                 responsible_parties=[
                     ResponsibleParty(party_type="platform", party_id="OLIST_PLATFORM")
@@ -101,7 +101,7 @@ class PolicyAgent:
             return PolicyResult(
                 primary_issue="unavailable_order_paid",
                 case_status="action_required",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="ORDER_UNAVAILABLE_AFTER_PAYMENT",
                 responsible_parties=[
                     ResponsibleParty(party_type="platform", party_id="OLIST_PLATFORM")
@@ -120,7 +120,7 @@ class PolicyAgent:
             return PolicyResult(
                 primary_issue="late_delivery_seller",
                 case_status="action_required",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="SELLER_HANDOFF_AFTER_LIMIT",
                 responsible_parties=parties,
                 recommended_refund_brl=round(freight_total, 2),
@@ -133,7 +133,7 @@ class PolicyAgent:
             return PolicyResult(
                 primary_issue="late_delivery_logistics",
                 case_status="action_required",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="CARRIER_DELIVERED_AFTER_ESTIMATE",
                 responsible_parties=[
                     ResponsibleParty(party_type="logistics_provider", party_id="LOGISTICS_PROVIDER")
@@ -148,7 +148,7 @@ class PolicyAgent:
             return PolicyResult(
                 primary_issue="valid_split_payment",
                 case_status="no_action",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="MULTIPLE_PAYMENTS_RECONCILED",
                 responsible_parties=[],
                 recommended_refund_brl=0.0,
@@ -160,7 +160,7 @@ class PolicyAgent:
         return PolicyResult(
             primary_issue="unsupported_late_claim",
             case_status="no_action",
-            confidence=1.0,
+            confidence=0.9,
             root_cause_code="DELIVERY_WITHIN_ESTIMATE",
             responsible_parties=[],
             recommended_refund_brl=0.0,

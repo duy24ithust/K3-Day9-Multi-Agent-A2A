@@ -117,7 +117,7 @@ class CoordinatorAgent:
             policy_res = PolicyResult(
                 primary_issue="unsupported_late_claim",
                 case_status="no_action",
-                confidence=1.0,
+                confidence=0.9,
                 root_cause_code="DELIVERY_WITHIN_ESTIMATE",
                 policy_evidence_id="policy:DELIVERY_WITHIN_ESTIMATE"
             )
