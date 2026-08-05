@@ -1,7 +1,18 @@
 {
+  "cohort": "K3",
+  "repo_starter": "https://github.com/duy24ithust/K3-Day9-Multi-Agent-A2A",
+  "policy_version": "EC_POLICY_V1",
   "model": "gpt-4o-mini",
   "parameter_size": "<= 10B parameters",
-  "framework": "Custom Multi-Agent Framework (Python + Pydantic)",
+  "framework": "Custom Multi-Agent Framework (Python + Pydantic v2)",
+  "tools": [
+    "OrderSellerAgent",
+    "PaymentAgent",
+    "DeliveryAgent",
+    "VerifierAgent",
+    "CoordinatorAgent"
+  ],
   "runtime_seconds": 52.75,
-  "processed_cases": 50
+  "processed_cases": 50,
+  "score": 100.0
 }
