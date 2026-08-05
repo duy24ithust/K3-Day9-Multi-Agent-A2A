@@ -2,6 +2,6 @@
   "model": "gpt-4o-mini",
   "parameter_size": "<= 10B parameters",
   "framework": "Custom Multi-Agent Framework (Python + Pydantic)",
-  "runtime_seconds": 52.75,
+  "runtime_seconds": 71.87,
   "processed_cases": 50
 }
