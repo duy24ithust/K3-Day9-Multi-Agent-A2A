@@ -113,7 +113,7 @@ class CoordinatorAgent:
             "recommended_refund_brl": policy_res.recommended_refund_brl
         })
 
-        # 5. Assemble Evidence IDs in strict standard order: order -> item -> payment -> seller -> policy
+        # 5. Assemble Evidence IDs in strict standard order: order -> item -> payment -> seller (only if seller at fault) -> policy
         evidence_ids = [f"order:{order_id}"]
         
         # Item evidence
@@ -124,9 +124,11 @@ class CoordinatorAgent:
         for pay_id in payment_res.payment_ids[:3]:
             evidence_ids.append(f"payment:{pay_id}")
             
-        # Seller evidence
-        for seller_id in order_seller_res.seller_ids[:3]:
-            evidence_ids.append(f"seller:{seller_id}")
+        # Seller evidence (ONLY included if seller is responsible / late_delivery_seller)
+        if policy_res.primary_issue == "late_delivery_seller":
+            target_sellers = order_seller_res.late_seller_ids or order_seller_res.seller_ids
+            for seller_id in target_sellers[:3]:
+                evidence_ids.append(f"seller:{seller_id}")
             
         # Policy evidence
         if policy_res.policy_evidence_id:
