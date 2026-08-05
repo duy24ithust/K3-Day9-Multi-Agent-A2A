@@ -9,8 +9,8 @@ from typing import List, Optional
 from dotenv import load_dotenv
 from src.contracts import OrderSellerResult, PaymentResult, PolicyResult, ResponsibleParty
 
-# Model declared in code as required by rule 4 (<= 10B parameters)
-LLM_MODEL_NAME = "meta-llama/llama-3.1-8b-instruct:free"
+# Model declared in code as required by rule 4 (<= 10B parameters, 9B Gemma-2 model)
+LLM_MODEL_NAME = "google/gemma-2-9b-it:free"
 
 load_dotenv()
 

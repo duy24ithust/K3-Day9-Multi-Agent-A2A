@@ -1,6 +1,6 @@
 {
-  "model": "meta-llama/llama-3.1-8b-instruct:free",
-  "parameter_size": "8B",
+  "model": "google/gemma-2-9b-it:free",
+  "parameter_size": "9B",
   "max_allowed_parameters": "10B",
   "framework": "OpenAI API / Custom Multi-Agent Pipeline",
   "runtime": "Python 3.10+",
