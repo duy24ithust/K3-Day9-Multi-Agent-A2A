@@ -112,21 +112,32 @@ class CoordinatorAgent:
             "recommended_refund_brl": policy_res.recommended_refund_brl
         })
 
-        # 5. Assemble Evidence IDs (Max 10)
+        # 5. Assemble Evidence IDs in recommended order (order, item, payment, seller, policy) & cap at 10
         evidence_ids = []
         evidence_ids.extend(order_seller_res.evidence_ids)
         evidence_ids.extend(payment_res.evidence_ids)
         if policy_res.policy_evidence_id and policy_res.policy_evidence_id not in evidence_ids:
             evidence_ids.append(policy_res.policy_evidence_id)
         
-        # Deduplicate while preserving order & cap at 10
+        # Deduplicate while preserving sequence
         seen = set()
         dedup_evidence = []
         for eid in evidence_ids:
             if eid not in seen:
                 seen.add(eid)
                 dedup_evidence.append(eid)
+
+        # Sort strictly by recommended prefix rank
+        prefix_rank = {"order:": 0, "item:": 1, "payment:": 2, "seller:": 3, "policy:": 4}
+        def get_rank(eid: str) -> int:
+            for p, r in prefix_rank.items():
+                if eid.startswith(p):
+                    return r
+            return 5
+
+        dedup_evidence.sort(key=get_rank)
         evidence_ids = dedup_evidence[:10]
+
 
         # 6. Assemble Final Output
         final_output = FinalCaseOutput(
