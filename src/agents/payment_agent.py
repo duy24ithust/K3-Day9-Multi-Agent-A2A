@@ -31,7 +31,7 @@ class PaymentAgent:
         :param freight_total_brl: Total freight cost in BRL (from OrderSellerAgent)
         :return: PaymentResult Pydantic contract model
         """
-        clean_order_id = order_id.strip('"\'' )
+        clean_order_id = str(order_id).strip().strip('"\'' ).strip()
         payments = self.repository.get_payments_by_order_id(clean_order_id)
 
         payment_count = len(payments)
@@ -42,7 +42,7 @@ class PaymentAgent:
         expected_total = round(item_total_brl + freight_total_brl, 2)
 
         # Reconcile within 0.10 BRL tolerance
-        payment_matches_order_total = abs(payment_total_brl - expected_total) <= 0.10
+        payment_matches_order_total = round(abs(payment_total_brl - expected_total), 2) <= 0.10
 
         # Split payment condition: >= 2 payment rows
         is_split_payment = payment_count >= 2
@@ -65,3 +65,13 @@ class PaymentAgent:
             payment_ids=payment_ids,
             evidence_ids=evidence_ids
         )
+
+    def analyze(
+        self,
+        order_id: str,
+        item_total_brl: float = 0.0,
+        freight_total_brl: float = 0.0
+    ) -> PaymentResult:
+        """Alias for process_payment to match CoordinatorAgent interface."""
+        return self.process_payment(order_id, item_total_brl, freight_total_brl)
+

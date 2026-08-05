@@ -55,5 +55,5 @@ class PaymentRepository:
         :param order_id: Clean string order_id
         :return: List of payment dicts containing payment_sequential, payment_type, etc.
         """
-        clean_order_id = order_id.strip('"\'' )
+        clean_order_id = str(order_id).strip().strip('"\'' ).strip()
         return self._payments_by_order.get(clean_order_id, [])
