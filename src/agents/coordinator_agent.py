@@ -92,7 +92,8 @@ class CoordinatorAgent:
 
         # 4. Handoff to Delivery & Policy Agent
         if self.policy_agent:
-            policy_res: PolicyResult = self.policy_agent.evaluate(order_seller_res, payment_res)
+            customer_msg = case_input.customer_request.message
+            policy_res: PolicyResult = self.policy_agent.evaluate(order_seller_res, payment_res, customer_msg)
         else:
             # Fallback/stub if agent not yet injected
             policy_res = PolicyResult(
@@ -112,11 +113,23 @@ class CoordinatorAgent:
             "recommended_refund_brl": policy_res.recommended_refund_brl
         })
 
-        # 5. Assemble Evidence IDs (Max 10)
-        evidence_ids = []
-        evidence_ids.extend(order_seller_res.evidence_ids)
-        evidence_ids.extend(payment_res.evidence_ids)
-        if policy_res.policy_evidence_id and policy_res.policy_evidence_id not in evidence_ids:
+        # 5. Assemble Evidence IDs in strict standard order: order -> item -> payment -> seller -> policy
+        evidence_ids = [f"order:{order_id}"]
+        
+        # Item evidence
+        for item_id in order_seller_res.item_ids[:3]:
+            evidence_ids.append(f"item:{item_id}")
+            
+        # Payment evidence
+        for pay_id in payment_res.payment_ids[:3]:
+            evidence_ids.append(f"payment:{pay_id}")
+            
+        # Seller evidence
+        for seller_id in order_seller_res.seller_ids[:3]:
+            evidence_ids.append(f"seller:{seller_id}")
+            
+        # Policy evidence
+        if policy_res.policy_evidence_id:
             evidence_ids.append(policy_res.policy_evidence_id)
         
         # Deduplicate while preserving order & cap at 10

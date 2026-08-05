@@ -13,12 +13,10 @@ from dotenv import load_dotenv
 
 from src.contracts import CaseInput, CustomerRequest
 from src.agents.coordinator_agent import CoordinatorAgent
-
-# Import teammate agents as they get implemented
-# from src.agents.order_seller_agent import OrderSellerAgent
-# from src.agents.payment_agent import PaymentAgent
-# from src.agents.policy_agent import PolicyAgent
-# from src.agents.verifier_agent import VerifierAgent
+from src.agents.order_seller_agent import OrderSellerAgent
+from src.agents.payment_agent import PaymentAgent
+from src.agents.delivery_agent import DeliveryAgent
+from src.agents.verifier_agent import VerifierAgent
 
 load_dotenv()
 
@@ -38,11 +36,11 @@ def main():
     print("  STARTING MULTI-AGENT E-COMMERCE DISPUTE RESOLUTION PIPELINE    ")
     print("==================================================================")
 
-    # Initialize teammate agents (Replace with real instances as code arrives)
-    order_seller_agent = None
-    payment_agent = None
-    policy_agent = None
-    verifier_agent = None
+    # Instantiate real teammate agents
+    order_seller_agent = OrderSellerAgent()
+    payment_agent = PaymentAgent()
+    policy_agent = DeliveryAgent()
+    verifier_agent = VerifierAgent()
 
     coordinator = CoordinatorAgent(
         order_seller_agent=order_seller_agent,

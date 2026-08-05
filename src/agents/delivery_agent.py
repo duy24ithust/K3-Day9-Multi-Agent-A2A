@@ -10,9 +10,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from pydantic import BaseModel
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_openrouter import ChatOpenRouter
+
+try:
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.output_parsers import JsonOutputParser
+    from langchain_openrouter import ChatOpenRouter
+    HAS_LANGCHAIN = True
+except ImportError:
+    HAS_LANGCHAIN = False
 
 from src.contracts import OrderSellerResult, PaymentResult, PolicyResult, ResponsibleParty
 from src.tools.delivery_tools import analyze_delivery_with_pandas, DeliveryCheckResult, DeliveryAssessment
@@ -25,14 +30,18 @@ class DeliveryAgent:
     """
     def __init__(self, model_name: str = "nvidia/nemotron-nano-9b-v2:free", data_dir: str = "data"):
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            print("Warning: OPENROUTER_API_KEY environment variable is not set. Set it in .env file.")
 
-        self.llm = ChatOpenRouter(
-            model=model_name,
-            openrouter_api_key=api_key or "dummy_key",
-            temperature=0.0
-        )
+        if HAS_LANGCHAIN and api_key:
+            try:
+                self.llm = ChatOpenRouter(
+                    model=model_name,
+                    openrouter_api_key=api_key,
+                    temperature=0.0
+                )
+            except Exception:
+                self.llm = None
+        else:
+            self.llm = None
         self.data_dir = data_dir
 
     def analyze_delivery_check(self, order_id: str) -> DeliveryCheckResult:
@@ -115,31 +124,46 @@ class DeliveryAgent:
 
         policy_evidence_id = f"policy:{root_cause_code}"
 
-        # 3. Enhance / Validate with LLM reasoning
-        try:
-            system_prompt = """You are the Delivery & Policy Agent in an E-commerce Multi-Agent Dispute System.
-Validate the policy decision against customer claim context and return JSON with confidence level (0.0 to 1.0).
-
-Return JSON format:
-{
-  "confidence": 0.95,
-  "reasoning": "..."
-}"""
-
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", system_prompt),
-                ("human", "Customer Message: {message}\nDetermined Issue: {primary_issue}\nRoot Cause: {root_cause_code}")
-            ])
-
-            chain = prompt | self.llm | JsonOutputParser()
-            llm_res = chain.invoke({
-                "message": customer_message or "Kiểm tra khiếu nại giao hàng",
-                "primary_issue": primary_issue,
-                "root_cause_code": root_cause_code
-            })
-            confidence = float(llm_res.get("confidence", 0.95))
-        except Exception:
+        # 3. Enhance / Validate with OpenAI gpt-4o-mini LLM reasoning if available
+        confidence = 0.95
+        if primary_issue in ["canceled_order_paid", "unavailable_order_paid", "valid_split_payment"]:
+            confidence = 1.0
+        elif primary_issue == "unsupported_late_claim":
+            confidence = 0.98
+        elif primary_issue in ["late_delivery_seller", "late_delivery_logistics"]:
             confidence = 0.95
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        if api_key:
+            try:
+                from openai import OpenAI
+                client = OpenAI(api_key=api_key)
+                system_prompt = (
+                    "You are an expert E-commerce Policy & Dispute Agent. "
+                    "Analyze the customer claim against determined policy issue and output JSON with confidence (0.0 to 1.0)."
+                )
+                user_msg = (
+                    f"Customer Message: {customer_message}\n"
+                    f"Determined Issue: {primary_issue}\n"
+                    f"Root Cause: {root_cause_code}\n"
+                    f"Refund: {recommended_refund_brl} BRL"
+                )
+                resp = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_msg}
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0.0
+                )
+                res_data = json.loads(resp.choices[0].message.content)
+                if "confidence" in res_data:
+                    c_val = float(res_data["confidence"])
+                    if 0.0 <= c_val <= 1.0:
+                        confidence = round(c_val, 2)
+            except Exception:
+                pass
 
         return PolicyResult(
             primary_issue=primary_issue,
