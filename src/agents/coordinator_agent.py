@@ -137,27 +137,11 @@ class CoordinatorAgent:
         evidence_ids.extend(payment_res.evidence_ids)
         if policy_res.policy_evidence_id and policy_res.policy_evidence_id not in evidence_ids:
             evidence_ids.append(policy_res.policy_evidence_id)
-        
-        # Collect responsible seller IDs from PolicyResult
-        responsible_seller_ids = {
-            party.party_id for party in policy_res.responsible_parties
-            if party.party_type == "seller"
-        }
-
-        # Filter out seller evidence if the seller is not a responsible party (prevents false positive evidence penalties)
-        filtered_evidence = []
-        for eid in evidence_ids:
-            if eid.startswith("seller:"):
-                s_id = eid.split("seller:", 1)[1]
-                if s_id in responsible_seller_ids:
-                    filtered_evidence.append(eid)
-            else:
-                filtered_evidence.append(eid)
 
         # Deduplicate while preserving sequence
         seen = set()
         dedup_evidence = []
-        for eid in filtered_evidence:
+        for eid in evidence_ids:
             if eid not in seen:
                 seen.add(eid)
                 dedup_evidence.append(eid)
